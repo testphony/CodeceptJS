@@ -49,6 +49,7 @@
     "commander": "^2.20.3",
     "css-to-xpath": "^0.1.0",
     "cucumber-expressions": "^6.6.2",
+    "deepmerge": "^4.2.2",
     "envinfo": "^7.3.1",
     "escape-string-regexp": "^1.0.3",
     "figures": "^2.0.0",
@@ -69,7 +70,8 @@
     "requireg": "^0.1.8",
     "resq": "^1.7.0",
     "semver": "^6.2.0",
-    "sprintf-js": "^1.1.1"
+    "sprintf-js": "^1.1.1",
+    "stacktrace-js": "^2.0.0"
   },
   "devDependencies": {
     "@codeceptjs/detox-helper": "^1.0.1",

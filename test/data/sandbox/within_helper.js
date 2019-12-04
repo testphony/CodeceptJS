@@ -5,11 +5,11 @@ const Step = require('../../../lib/step');
 
 class Within extends Helper {
   _withinBegin(testStr) {
-    output.step(new Step(this.constructor.name, `Hey! I am within Begin. I get ${testStr}`));
+    output.step(new Step(this.constructor.name, `Hey! I am within Begin. I get ${testStr}`), true);
   }
 
   _withinEnd() {
-    output.step(new Step(this.constructor.name, 'oh! I am within end('));
+    output.step(new Step(this.constructor.name, 'oh! I am within end('), true);
   }
 
   _failed() {
@@ -25,7 +25,7 @@ class Within extends Helper {
       setTimeout(() => {
         resolve('result');
       }, 100);
-    }).then(() => output.step(new Step(this.constructor.name, 'small Promise was finished')));
+    }).then(() => output.step(new Step(this.constructor.name, 'small Promise was finished'), true));
   }
 
   errorStep() {

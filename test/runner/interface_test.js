@@ -187,15 +187,15 @@ describe('CodeceptJS Interface', () => {
       const lines = stdout.split('\n');
       lines.should.include.members([
         '  check current dir',
-        '    I: openDir ',
+        '    I open dir "aaa"',
         '      I am in path "."',
-        '      I see file "codecept.json"',
-        '    MyPage: hasFile ',
-        '      I see file "codecept.json"',
-        '      I see file "codecept.po.json"',
+        '    I see file "codecept.json"',
+        '    MyPage has file "uu"',
+        '        I see file "codecept.json"',
+        '        I see file "codecept.po.json"',
         '    I see file "codecept.po.json"',
       ]);
-      stdout.should.include('OK  | 1 passed');
+      stdout.should.include('  OK  | 1 passed');
       assert(!err);
       done();
     });
@@ -207,12 +207,12 @@ describe('CodeceptJS Interface', () => {
       stdout.should.include('injected');
       lines.should.include.members([
         '  check current dir',
-        '    I: openDir ',
+        '    I open dir "aaa"',
         '      I am in path "."',
-        '      I see file "codecept.json"',
-        '    MyPage: hasFile ',
-        '      I see file "codecept.json"',
-        '      I see file "codecept.po.json"',
+        '    I see file "codecept.json"',
+        '    MyPage has file "uu"',
+        '        I see file "codecept.json"',
+        '        I see file "codecept.po.json"',
         '    I see file "codecept.po.json"',
       ]);
       stdout.should.include('OK  | 1 passed');

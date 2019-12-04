@@ -964,6 +964,9 @@ declare namespace CodeceptJS {
          */
         waitForText(text: string, sec?: number, context?: CodeceptJS.LocatorOrString): void;
     }
+    class Mochawesome {
+      addMochawesomeContext(addMochawesomeContext: any): void;
+    }
     class FileSystem {
         /**
          * Enters a directory In local filesystem.

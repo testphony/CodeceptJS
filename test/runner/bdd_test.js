@@ -8,7 +8,7 @@ const codecept_run = `${runner} run`;
 const config_run_config = config => `${codecept_run} --config ${codecept_dir}/${config}`;
 const config_run_override = config => `${codecept_run} --override '${JSON.stringify(config)}'`;
 
-describe('BDD Gherkin', () => {
+xdescribe('BDD Gherkin', () => {
   before(() => {
     process.chdir(codecept_dir);
   });

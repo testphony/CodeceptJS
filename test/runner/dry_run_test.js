@@ -11,7 +11,7 @@ const codecept_run_config = config => `${codecept_run} --config ${codecept_dir}/
 const config_run_override = config => `${codecept_run} --override '${JSON.stringify(config)}'`;
 const char = require('figures').checkboxOff;
 
-describe('dry-run command', () => {
+xdescribe('dry-run command', () => {
   before(() => {
     process.chdir(codecept_dir);
   });
