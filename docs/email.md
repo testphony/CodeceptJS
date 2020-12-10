@@ -1,7 +1,9 @@
 ---
-id: email
+permalink: /email
 title: Email Testing
 ---
+
+# Email Testing
 
 In End 2 End testing we need to interact with emails.
 Email delivery can't tested locally or mocked while testing.
@@ -62,7 +64,7 @@ const mailbox1 = await I.haveNewMailbox();
 const mailbox2 = await I.haveNewMailbox();
 // mailbox2 is now default mailbox
 // switch back to mailbox1
-I.openMailbox(mailbox);
+I.openMailbox(mailbox1);
 ```
 
 ## Receiving An Email
@@ -153,7 +155,7 @@ I.seeInEmailSubject('Awesome Proposal!');
 I.seeInEmailBody('To unsubscribe click here');
 ```
 
-> More methods are listed in [helper's API reference](https://github.com/codecept-js/mailslurp-helper/blob/master/README.md#api)
+> More methods are listed in [helper's API reference](https://github.com/codeceptjs/mailslurp-helper/blob/master/README.md#api)
 
 ## Listing All Emails
 

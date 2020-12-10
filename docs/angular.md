@@ -1,5 +1,5 @@
 ---
-id: angular
+permalink: /angular
 title: Testing with Protractor
 ---
 
@@ -14,18 +14,18 @@ This way you aren't bound to a specific implementation, and your acceptance test
 [Protractor](http://www.protractortest.org/#/) is an official tool for testing AngularJS applications.
 CodeceptJS should not be considered as alternative to Protractor, but rather a testing framework that leverages this powerful library.
 
-![angular-protractor](https://codecept.io/img/angular-protractor.png)
+![angular-protractor](/img/angular-protractor.png)
 
 There is no magic in testing of AngularJS application in CodeceptJS.
 You just execute regular Protractor commands, packaged into a simple, high-level API.
 
-![todo-mvc](https://codecept.io/img/todo.png)
+![todo-mvc](/img/todo.png)
 
 As an example, we will use the popular [TodoMVC application](http://todomvc.com/examples/angularjs/#/).
 How would we test creating a new todo item using CodeceptJS?
 
 ```js
-Scenario('create todo item', (I) => {
+Scenario('create todo item', ({ I }) => {
   I.amOnPage('/');
   I.dontSeeElement('#todo-count');
   I.fillField({model: 'newTodo'}, 'Write a guide');
@@ -169,7 +169,7 @@ To start with opening a webpage, use the `amOnPage` command for. Since we alread
 ```js
 Feature('Todo MVC');
 
-Scenario('create todo item', (I) => {
+Scenario('create todo item', ({ I }) => {
   I.amOnPage('/');
 });
 ```
@@ -179,7 +179,7 @@ All scenarios should describe actions on the site, with assertions at the end. I
 ```js
 Feature('Todo MVC');
 
-Scenario('create todo item', (I) => {
+Scenario('create todo item', ({ I }) => {
   I.amOnPage('/');
   I.dontSeeElement('#todo-count');
 });
@@ -211,7 +211,7 @@ Our scenarios will also probably deal with created todo items, so we can move th
 ```js
 Feature('TodoMvc');
 
-Before((I) => {
+Before(({ I }) => {
   I.amOnPage('/');
 });
 
@@ -220,7 +220,7 @@ const createTodo = function (I, name) {
   I.pressKey('Enter');
 }
 
-Scenario('create todo item', (I) => {
+Scenario('create todo item', ({ I }) => {
   I.dontSeeElement('#todo-count');
   createTodo(I, 'Write a guide');
   I.see('Write a guide', {repeater: "todo in todos"});
@@ -231,7 +231,7 @@ Scenario('create todo item', (I) => {
 and now we can add even more tests!
 
 ```js
-Scenario('edit todo', (I) => {
+Scenario('edit todo', ({ I }) => {
   createTodo(I, 'write a review');
   I.see('write a review', {repeater: "todo in todos"});
   I.doubleClick('write a review');
@@ -241,7 +241,7 @@ Scenario('edit todo', (I) => {
   I.see('write old review', {repeater: "todo in todos"});
 });
 
-Scenario('check todo item', (I) => {
+Scenario('check todo item', ({ I }) => {
   createTodo(I, 'my new item');
   I.see('1 item left', '#todo-count');
   I.checkOption({model: 'todo.completed'});
@@ -291,7 +291,7 @@ module.exports = function() {
 That's it, our method is now available to use as `I.createTodo(title)`:
 
 ```js
-Scenario('create todo item', (I) => {
+Scenario('create todo item', ({ I }) => {
   I.dontSeeElement('#todo-count');
   I.createTodo('Write a guide');
   I.see('Write a guide', {repeater: "todo in todos"});

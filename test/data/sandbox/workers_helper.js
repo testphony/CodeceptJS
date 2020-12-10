@@ -1,8 +1,7 @@
-const Helper = require('../../../lib/helper');
-const output = require('../../../lib/output');
-const Step = require('../../../lib/step');
-const { Worker, isMainThread } = require('worker_threads');
 const assert = require('assert');
+const { isMainThread } = require('worker_threads');
+
+const Helper = require('../../../lib/helper');
 
 class Workers extends Helper {
   seeThisIsWorker() {

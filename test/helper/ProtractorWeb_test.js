@@ -1,18 +1,16 @@
-const TestHelper = require('../support/TestHelper');
 const assert = require('assert');
-const path = require('path');
 const fs = require('fs');
-const fileExists = require('../../lib/utils').fileExists;
+const path = require('path');
+
+const TestHelper = require('../support/TestHelper');
 const Protractor = require('../../lib/helper/Protractor');
 const AssertionFailedError = require('../../lib/assert/error');
 const webApiTests = require('./webapi');
 
 let I;
 let browser;
-const should = require('chai').should();
 
 const siteUrl = TestHelper.siteUrl();
-const formContents = require('../../lib/utils').test.submittedData(path.join(__dirname, '/../data/app/db'));
 
 describe('Protractor-NonAngular', function () {
   this.retries(3);
@@ -49,7 +47,6 @@ describe('Protractor-NonAngular', function () {
     }));
   });
 
-
   beforeEach(() => {
     webApiTests.init({
       I,
@@ -70,7 +67,6 @@ describe('Protractor-NonAngular', function () {
       .then(() => I.see('Height 600', '#height'))
       .then(() => I.see('Width 950', '#width')));
   });
-
 
   after(() => I._after());
 
@@ -105,7 +101,6 @@ describe('Protractor-NonAngular', function () {
       await I.seeInField('Name', '!!!1');
     });
   });
-
 
   webApiTests.tests();
 
@@ -277,7 +272,7 @@ describe('Protractor-NonAngular', function () {
       .then(html => assert.equal(html.trim(), '<a href="/form/file" qa-id="test" qa-link="test"> Test Link </a>')));
 
     it('should grab inner html from multiple elements', () => I.amOnPage('/')
-      .then(() => I.grabHTMLFrom('//a'))
+      .then(() => I.grabHTMLFromAll('//a'))
       .then(html => assert.equal(html.length, 5)));
   });
 
@@ -302,7 +297,6 @@ describe('Protractor-NonAngular', function () {
       .then(() => I.grabPopupText())
       .then(text => assert.equal(text, 'Really?'))
       .then(() => I.cancelPopup())); // TODO: Remove the cancelPopup line.
-
 
     it('should return null if no popup is visible (do not throw an error)', () => I.amOnPage('/form/popup')
       .then(() => I.grabPopupText())
@@ -396,7 +390,7 @@ describe('Protractor-NonAngular', function () {
     it('should not locate a non-existing field', async () => {
       await I.amOnPage('/form/field');
       try {
-        const els = await I._locateFields('Mother-in-law');
+        await I._locateFields('Mother-in-law');
         throw Error('Should not get this far');
       } catch (e) {
         e.message.should.include = 'No element found using locator:';

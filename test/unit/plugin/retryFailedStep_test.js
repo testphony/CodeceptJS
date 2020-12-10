@@ -1,11 +1,9 @@
 const retryFailedStep = require('../../../lib/plugin/retryFailedStep');
-const sinon = require('sinon');
 const within = require('../../../lib/within');
 const session = require('../../../lib/session');
 const container = require('../../../lib/container');
 const event = require('../../../lib/event');
 const recorder = require('../../../lib/recorder');
-const assert = require('assert');
 
 describe('retryFailedStep', () => {
   beforeEach(() => {
@@ -50,7 +48,7 @@ describe('retryFailedStep', () => {
       });
       await recorder.promise();
     } catch (e) {
-      recorder.catchWithoutStop((err) => {});
+      recorder.catchWithoutStop((err) => err);
     }
 
     // expects to retry only once
@@ -72,8 +70,7 @@ describe('retryFailedStep', () => {
       });
       await recorder.promise();
     } catch (e) {
-      recorder.catchWithoutStop((err) => {
-      });
+      recorder.catchWithoutStop((err) => err);
     }
 
     counter.should.equal(1);
@@ -95,14 +92,12 @@ describe('retryFailedStep', () => {
       });
       await recorder.promise();
     } catch (e) {
-      recorder.catchWithoutStop((err) => {
-      });
+      recorder.catchWithoutStop((err) => err);
     }
 
     counter.should.equal(1);
     // expects to retry only once
   });
-
 
   it('should add custom steps to ignore', async () => {
     retryFailedStep({ retries: 2, minTimeout: 1, ignoredSteps: ['somethingNew*'] });
@@ -119,8 +114,7 @@ describe('retryFailedStep', () => {
       });
       await recorder.promise();
     } catch (e) {
-      recorder.catchWithoutStop((err) => {
-      });
+      recorder.catchWithoutStop((err) => err);
     }
 
     counter.should.equal(1);
@@ -142,7 +136,7 @@ describe('retryFailedStep', () => {
       });
       await recorder.promise();
     } catch (e) {
-      recorder.catchWithoutStop((err) => {});
+      recorder.catchWithoutStop((err) => err);
     }
 
     // expects to retry only once

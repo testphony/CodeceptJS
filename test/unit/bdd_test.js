@@ -11,6 +11,7 @@ const run = require('../../lib/interfaces/gherkin');
 const recorder = require('../../lib/recorder');
 const container = require('../../lib/container');
 const actor = require('../../lib/actor');
+const event = require('../../lib/event');
 
 const text = `
   Feature: checkout process
@@ -68,7 +69,6 @@ describe('BDD', () => {
     assert.equal('@super', suite.tests[0].tags[0]);
   });
 
-
   it('should load step definitions', (done) => {
     let sum = 0;
     Given(/I have product with (\d+) price/, param => sum += parseInt(param, 10));
@@ -81,7 +81,6 @@ describe('BDD', () => {
       done();
     });
   });
-
 
   it('should allow failed steps', (done) => {
     let sum = 0;
@@ -114,7 +113,6 @@ describe('BDD', () => {
       done();
     });
   });
-
 
   it('should execute scenarios step-by-step ', (done) => {
     printed = [];
@@ -168,6 +166,25 @@ describe('BDD', () => {
     assert.equal('bird', fn.params[0]);
   });
 
+  it('should produce step events', (done) => {
+    const text = `
+    Feature: Emit step event
+
+      Scenario:
+        Then I emit step events
+    `;
+    Then('I emit step events', () => {});
+    let listeners = 0;
+    event.dispatcher.addListener(event.bddStep.before, () => listeners++);
+    event.dispatcher.addListener(event.bddStep.after, () => listeners++);
+
+    const suite = run(text);
+    suite.tests[0].fn(() => {
+      listeners.should.eql(2);
+      done();
+    });
+  });
+
   it('should use shortened form for step definitions', () => {
     let fn;
     Given('I am a {word}', params => params[0]);
@@ -218,6 +235,11 @@ describe('BDD', () => {
       Examples:
         | price | total |
         | 10    | 9     |
+
+      @exampleTag1
+      @exampleTag2
+      Examples:
+        | price | total |
         | 20    | 18    |
     `;
     let cart = 0;
@@ -235,9 +257,8 @@ describe('BDD', () => {
     const suite = run(text);
 
     assert.ok(suite.tests[0].tags);
-    assert.equal('@awesome', suite.tests[0].tags[0]);
-    assert.equal('@cool', suite.tests[0].tags[1]);
-    assert.equal('@super', suite.tests[0].tags[2]);
+    assert.deepEqual(['@awesome', '@cool', '@super'], suite.tests[0].tags);
+    assert.deepEqual(['@awesome', '@cool', '@super', '@exampleTag1', '@exampleTag2'], suite.tests[1].tags);
 
     assert.equal(2, suite.tests.length);
     suite.tests[0].fn(() => {
@@ -249,6 +270,47 @@ describe('BDD', () => {
         assert.equal(18, sum);
         done();
       });
+    });
+  });
+
+  it('should provide a parsed DataTable', (done) => {
+    const text = `
+    @awesome @cool
+    Feature: checkout process
+
+    @super
+    Scenario: order products
+      Given I have the following products :
+        | label   | price  |
+        | beer    | 9      |
+        | cookies | 12     |
+      Then I should see the following products :
+        | label   | price  |
+        | beer    | 9      |
+        | cookies | 12     |
+    `;
+
+    let givenParsedRows;
+    let thenParsedRows;
+
+    Given('I have the following products :', (products) => {
+      givenParsedRows = products.parse();
+    });
+    Then('I should see the following products :', (products) => {
+      thenParsedRows = products.parse();
+    });
+
+    const suite = run(text);
+
+    const expectedParsedDataTable = [
+      ['label', 'price'],
+      ['beer', '9'],
+      ['cookies', '12'],
+    ];
+    suite.tests[0].fn(() => {
+      assert.deepEqual(givenParsedRows.rawData, expectedParsedDataTable);
+      assert.deepEqual(thenParsedRows.rawData, expectedParsedDataTable);
+      done();
     });
   });
 });

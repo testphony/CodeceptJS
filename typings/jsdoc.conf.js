@@ -8,7 +8,6 @@ module.exports = {
       './lib/container.js',
       './lib/data/table.js',
       './lib/event.js',
-      './lib/Helper.js',
       './lib/helper/clientscripts/nightmare.js',
       './lib/index.js',
       './lib/interfaces',
@@ -22,7 +21,8 @@ module.exports = {
       './lib/store.js',
       './lib/ui.js',
       './lib/within.js',
-      './node_modules/@codeceptjs/detox-helper/Detox.js',
+      require.resolve('@codeceptjs/detox-helper'),
+      require.resolve('@codeceptjs/helper'),
     ],
   },
   opts: {

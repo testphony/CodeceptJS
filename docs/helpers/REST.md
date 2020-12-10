@@ -1,5 +1,7 @@
 ---
-id: REST
+permalink: /helpers/REST
+editLink: false
+sidebar: auto
 title: REST
 ---
 
@@ -18,6 +20,7 @@ REST helper allows to send additional requests to the REST API during acceptance
 -   timeout: timeout for requests in milliseconds. 10000ms by default
 -   defaultHeaders: a list of default headers
 -   onRequest: a async function which can update request object.
+-   maxUploadFileSize: set the max content file size in MB when performing api calls.
 
 ## Example
 
@@ -77,7 +80,7 @@ I.sendDeleteRequest('/api/users/1');
 #### Parameters
 
 -   `url` **any** 
--   `headers` **[object][2]**  
+-   `headers` **[object][2]** the headers object to be sent. By default it is sent as an empty object 
 
 ### sendGetRequest
 
@@ -90,7 +93,7 @@ I.sendGetRequest('/api/users.json');
 #### Parameters
 
 -   `url` **any** 
--   `headers` **[object][2]**  
+-   `headers` **[object][2]** the headers object to be sent. By default it is sent as an empty object 
 
 ### sendPatchRequest
 
@@ -103,8 +106,8 @@ I.sendPatchRequest('/api/users.json', { "email": "user@user.com" });
 #### Parameters
 
 -   `url` **[string][3]** 
--   `payload` **[object][2]** 
--   `headers` **[object][2]**  
+-   `payload` **any** the payload to be sent. By default it is sent as an empty object 
+-   `headers` **[object][2]** the headers object to be sent. By default it is sent as an empty object 
 
 ### sendPostRequest
 
@@ -117,8 +120,8 @@ I.sendPostRequest('/api/users.json', { "email": "user@user.com" });
 #### Parameters
 
 -   `url` **any** 
--   `payload` **any**  
--   `headers` **[object][2]**  
+-   `payload` **any** the payload to be sent. By default it is sent as an empty object 
+-   `headers` **[object][2]** the headers object to be sent. By default it is sent as an empty object 
 
 ### sendPutRequest
 
@@ -131,8 +134,8 @@ I.sendPutRequest('/api/users.json', { "email": "user@user.com" });
 #### Parameters
 
 -   `url` **[string][3]** 
--   `payload` **[object][2]**  
--   `headers` **[object][2]**  
+-   `payload` **any** the payload to be sent. By default it is sent as an empty object 
+-   `headers` **[object][2]** the headers object to be sent. By default it is sent as an empty object 
 
 ### setRequestTimeout
 

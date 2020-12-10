@@ -1,8 +1,9 @@
-const container = require('../../lib/container');
 const assert = require('assert');
 const path = require('path');
+
 const FileSystem = require('../../lib/helper/FileSystem');
 const actor = require('../../lib/actor');
+const container = require('../../lib/container');
 
 describe('Container', () => {
   before(() => {
@@ -19,7 +20,6 @@ describe('Container', () => {
     });
   });
 
-
   describe('#translation', () => {
     const Translation = require('../../lib/translation');
 
@@ -30,12 +30,28 @@ describe('Container', () => {
       container.translation().actionAliasFor('see').should.eql('see');
     });
 
-    it('should create russian translation', () => {
+    it('should create Russian translation', () => {
       container.create({ translation: 'ru-RU' });
       container.translation().should.be.instanceOf(Translation);
       container.translation().loaded.should.be.true;
       container.translation().I.should.eql('Я');
       container.translation().actionAliasFor('see').should.eql('вижу');
+    });
+
+    it('should create Italian translation', () => {
+      container.create({ translation: 'it-IT' });
+      container.translation().should.be.instanceOf(Translation);
+      container.translation().loaded.should.be.true;
+      container.translation().I.should.eql('io');
+      container.translation().value('contexts').Feature.should.eql('Caratteristica');
+    });
+
+    it('should create French translation', () => {
+      container.create({ translation: 'fr-FR' });
+      container.translation().should.be.instanceOf(Translation);
+      container.translation().loaded.should.be.true;
+      container.translation().I.should.eql('Je');
+      container.translation().value('contexts').Feature.should.eql('Fonctionnalité');
     });
   });
 
@@ -163,7 +179,6 @@ describe('Container', () => {
       container.support('dummyPage').should.include.keys('openDummyPage');
       container.support('dummyPage').getI().should.have.keys(Object.keys(container.support('I')));
     });
-
 
     it('should load DI and inject custom I into PO', () => {
       container.create({

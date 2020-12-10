@@ -2,6 +2,7 @@ const fs = require('fs');
 const assert = require('assert');
 const path = require('path');
 const exec = require('child_process').exec;
+const execSync = require('child_process').execSync;
 const chai = require('chai');
 const chaiSubset = require('chai-subset');
 const { Project, StructureKind, ts } = require('ts-morph');
@@ -17,8 +18,11 @@ const pathToTypings = path.resolve(pathToRootOfProject, 'typings');
 chai.use(chaiSubset);
 
 describe('Definitions', function () {
-  this.timeout(10000);
+  this.timeout(20000);
   this.retries(4);
+  before(() => {
+    execSync('npm run def', { cwd: pathToRootOfProject });
+  });
   afterEach(() => {
     try {
       fs.unlinkSync(`${codecept_dir}/steps.d.ts`);
@@ -35,23 +39,23 @@ describe('Definitions', function () {
         types.should.be.valid;
 
         const definitionsFile = types.getSourceFileOrThrow(pathOfJSDocDefinitions);
-        const index = definitionsFile.getNamespaceOrThrow('CodeceptJS').getInterfaceOrThrow('index').getStructure();
-        index.properties.should.containSubset([
-          { name: 'recorder', type: 'CodeceptJS.recorder' },
-          { name: 'event', type: 'CodeceptJS.event' },
-          { name: 'output', type: 'CodeceptJS.output' },
-          { name: 'config', type: 'typeof CodeceptJS.Config' },
-          { name: 'container', type: 'typeof CodeceptJS.Container' },
+        const index = definitionsFile.getNamespaceOrThrow('CodeceptJS').getNamespaceOrThrow('index').getStructure();
+        index.statements.should.containSubset([
+          { declarations: [{ name: 'recorder', type: 'CodeceptJS.recorder' }] },
+          { declarations: [{ name: 'event', type: 'typeof CodeceptJS.event' }] },
+          { declarations: [{ name: 'output', type: 'typeof CodeceptJS.output' }] },
+          { declarations: [{ name: 'config', type: 'typeof CodeceptJS.Config' }] },
+          { declarations: [{ name: 'container', type: 'typeof CodeceptJS.Container' }] },
         ]);
         const codeceptjs = types.getSourceFileOrThrow(pathOfStaticDefinitions).getVariableDeclarationOrThrow('codeceptjs').getStructure();
-        codeceptjs.type.should.equal('CodeceptJS.index');
+        codeceptjs.type.should.equal('typeof CodeceptJS.index');
         done();
       });
     });
   });
 
   it('def should create definition file', (done) => {
-    exec(`${runner} def ${codecept_dir}`, (err, stdout, stderr) => {
+    exec(`${runner} def ${codecept_dir}`, (err, stdout) => {
       stdout.should.include('Definitions were generated in steps.d.ts');
       const types = typesFrom(`${codecept_dir}/steps.d.ts`);
       types.should.be.valid;
@@ -90,7 +94,7 @@ describe('Definitions', function () {
   });
 
   it('def should create definition file given a config file', (done) => {
-    exec(`${runner} def --config ${codecept_dir}/../../codecept.ddt.json`, (err, stdout, stderr) => {
+    exec(`${runner} def --config ${codecept_dir}/../../codecept.ddt.json`, (err, stdout) => {
       stdout.should.include('Definitions were generated in steps.d.ts');
       const types = typesFrom(`${codecept_dir}/../../steps.d.ts`);
       types.should.be.valid;
@@ -141,7 +145,7 @@ describe('Definitions', function () {
   });
 
   it('def should create definition file with inject which contains I object', (done) => {
-    exec(`${runner} def --config ${codecept_dir}/codecept.inject.po.json`, (err, stdout, stderr) => {
+    exec(`${runner} def --config ${codecept_dir}/codecept.inject.po.json`, (err) => {
       assert(!err);
       const types = typesFrom(`${codecept_dir}/steps.d.ts`);
       types.should.be.valid;
@@ -151,7 +155,7 @@ describe('Definitions', function () {
       returned.should.containSubset([
         {
           properties: [
-            { name: 'I', type: 'CodeceptJS.I' },
+            { name: 'I', type: 'I' },
             { name: 'MyPage', type: 'MyPage' },
           ],
         },
@@ -168,7 +172,7 @@ describe('Definitions', function () {
       const definitionsFile = types.getSourceFileOrThrow(pathOfStaticDefinitions);
       const returned = getReturnStructure(definitionsFile.getFunctionOrThrow('inject'));
       returned.should.containSubset([{
-        properties: [{ name: 'I', type: 'CodeceptJS.I' }],
+        properties: [{ name: 'I', type: 'I' }],
       }]);
       done();
     });
@@ -180,11 +184,11 @@ describe('Definitions', function () {
       types.should.be.valid;
 
       const definitionsFile = types.getSourceFileOrThrow(`${codecept_dir}/steps.d.ts`);
-      const CallbackOrder = definitionsFile.getNamespaceOrThrow('CodeceptJS').getInterfaceOrThrow('CallbackOrder').getStructure();
+      const CallbackOrder = definitionsFile.getNamespaceOrThrow('CodeceptJS').getInterfaceOrThrow('SupportObject').getStructure();
       CallbackOrder.properties.should.containSubset([
-        { name: '[0]', type: 'CodeceptJS.I' },
-        { name: '[1]', type: 'MyPage' },
-        { name: '[2]', type: 'SecondPage' },
+        { name: 'I', type: 'I' },
+        { name: 'MyPage', type: 'MyPage' },
+        { name: 'SecondPage', type: 'SecondPage' },
       ]);
       done();
     });
@@ -206,7 +210,6 @@ chai.use((chai, utils) => {
     if (diagnostics.length > 0) throw new Error(project.formatDiagnosticsWithColorAndContext(diagnostics));
   });
 });
-
 
 /**
  * Resolves 'codeceptjs' type directive to the internal file,
@@ -264,7 +267,7 @@ function typesFrom(sourceFile) {
  * @param {import('ts-morph').Node} node
 */
 function getExtends(node) {
-  return node.getExtends().map((symbol) => {
+  return node.getExtends().map(() => {
     const result = {};
     /** @type {import('ts-morph').Type} */
     result.properties = result.properties || [];

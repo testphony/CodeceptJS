@@ -1,7 +1,9 @@
 ---
-id: puppeteer
+permalink: /puppeteer
 title: Testing with Puppeteer
 ---
+
+# Testing with Puppeteer
 
 Among all Selenium alternatives the most interesting emerging ones are tools developed around Google Chrome [DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/). And the most prominent one is [Puppeteer](https://github.com/GoogleChrome/puppeteer). It operates over Google Chrome directly without requiring additional tools like ChromeDriver. So tests setup with Puppeteer can be started with npm install only. If you want get faster and simpler to setup tests, Puppeteer would be your choice.
 
@@ -41,7 +43,7 @@ npx codeceptjs init
 
 You will be asked for a Helper to use, you should select Puppeteer and provide url of a website you are testing.
 
-> Puppeteer can also work with Firefox. [Learn how to set it up](https://codecept.io/helpers/Puppeteer-firefox)
+> Puppeteer can also work with Firefox. [Learn how to set it up](/helpers/Puppeteer-firefox)
 
 ## Configuring
 
@@ -127,12 +129,12 @@ I.seeElement({xpath: '//body/header'});
 
 ### Interactive Pause
 
-It's easy to start writing a test if you use [interactive pause](https://codecept.io/basics#debug). Just open a web page and pause execution.
+It's easy to start writing a test if you use [interactive pause](/basics#debug). Just open a web page and pause execution.
 
 ```js
 Feature('Sample Test');
 
-Scenario('open my website', (I) => {
+Scenario('open my website', ({ I }) => {
   I.amOnPage('http://todomvc.com/examples/react/');
   pause();
 });
@@ -153,7 +155,7 @@ A complete ToDo-MVC test may look like:
 ```js
 Feature('ToDo');
 
-Scenario('create todo item', (I) => {
+Scenario('create todo item', ({ I }) => {
   I.amOnPage('http://todomvc.com/examples/react/');
   I.dontSeeElement('.todo-count');
   I.fillField('What needs to be done?', 'Write a guide');
@@ -169,7 +171,7 @@ If you need to get element's value inside a test you can use `grab*` methods. Th
 
 ```js
 const assert = require('assert');
-Scenario('get value of current tasks', async (I) => {
+Scenario('get value of current tasks', async ({ I }) => {
   I.createTodo('do 1');
   I.createTodo('do 2');
   let numTodos = await I.grabTextFrom('.todo-count strong');
@@ -191,11 +193,12 @@ within('.todoapp', () => {
 I.see('0 items left', '.todo-count');
 ```
 
-> [▶ Learn more about basic commands](https://codecept.io/basics#writing-tests)
+> [▶ Learn more about basic commands](/basics#writing-tests)
 
 CodeceptJS allows you to implement custom actions like `I.createTodo` or use **PageObjects**. Learn how to improve your tests in [PageObjects](http://codecept.io/pageobjects/) guide.
 
 > [▶ Demo project is available on GitHub](https://github.com/DavertMik/codeceptjs-todomvc-puppeteer)
+
 
 ## Mocking Requests
 
@@ -204,7 +207,7 @@ When you run tests with Puppeteer you can control those requests by mocking them
 
 Also you can replace real request with a one explicitly defined. This is useful when you want to isolate application testing from a backend. For instance, if you don't want to save data to database, and you know the request which performs save, you can mock the request, so application will treat this as valid response, but no data will be actually saved.
 
-To mock requests enable additional helper [MockRequest](https://codecept.io/helpers/MockRequest) (which is based on Polly.js).
+To mock requests enable additional helper [MockRequest](/helpers/MockRequest) (which is based on Polly.js).
 
 ```js
 helpers: {
@@ -234,7 +237,7 @@ I.mockRequest('POST', '/api/users', { user: 'davert' });
 I.mockRequest('GET', '/api/users/1', 404, { error: 'User not found' });
 ```
 
-> See [`mockRequest` API](https://codecept.io/helpers/MockRequest#mockrequest)
+> See [`mockRequest` API](/helpers/MockRequest#mockrequest)
 
 To see `mockRequest` method in intellisense auto completion don't forget to run `codeceptjs def` command:
 
@@ -245,54 +248,34 @@ npx codeceptjs def
 Mocking rules will be kept while a test is running. To stop mocking use `I.stopMocking()` command
 
 
-## Cloud Browsers
+## Accessing Puppeteer API
 
-Puppeteer browser can be executed locally or remotely.
-If you want to run your tests in parallel you may face problem of maintaining infrastructure for Puppeteer tests.
-
-That's why we recommend using [Aerokube Browsers](https://browsers.aerokube.com) as a fast cloud provider for browsers. At this moment, this is the only cloud provider that can launch multiple puppeteer sessions for you.
-
-To start with Aerokube Browsers you need to register at [Aerokube Browsers](https://browsers.aerokube.com) and obtain a private key. Then install `aerokube-plugin`:
-
-```
-npm i @codeceptjs/aerokube-plugin --save-dev
-```
-
-And add this plugin to a config. Please provide Aerokube credentials in configuration:
+To get Puppeteer API inside a test use [`I.usePupepteerTo`](/helpers/Puppeteer/#usepuppeteerto) method with a callback.
+To keep test readable provide a description of a callback inside the first parameter.
 
 ```js
-// codecept.conf.js config
-exports.config = {
-  helpers: {
-    Puppeteer: {
-     // regular Puppeteer config goes here
-     // no need to change anything here
-    }
-  },
-  // ....
-  plugins: {
-    aerokube: {
-      // uncomment next line to permanently enable this plugin
-      // enabled: true,
-       require: '@codeceptjs/aerokube-plugin',
-       user: '<username from aerokube>',
-       password: '<password from aerokube>',
-     }
-  }
-}
+I.usePuppeteerTo('emulate offline mode', async ({ page, browser }) => {
+  await page.setOfflineMode(true);
+});
 ```
 
-To launch tests and use Aerokube Browsers enable `aerokube` plugin from a command line:
+> Puppeteer commands are asynchronous so a callback function must be async.
 
+A Puppeteer helper is passed as argument for callback, so you can combine Puppeteer API with CodeceptJS API:
+
+```js
+I.usePuppeteerTo('emulate offline mode', async (Puppeteer) => {
+  // access internal objects browser, page, context of helper
+  await Puppeteer.page.setOfflineMode(true);
+  // call a method of helper, await is required here
+  await Puppeteer.click('Reload');
+});
 ```
-npx codeceptjs run --plugins aerokube
-```
 
-> ℹ When running a browser from Aerokube it can't access your local environment or private networks. Consider using [Selenoid or Moon](https://aerokube.com) to set up a private browsers cloud.
 
-## Extending
+## Extending Helper
 
-Puppeteer has a very [rich and flexible API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md). Sure, you can extend your test suites to use the methods listed there. CodeceptJS already prepares some objects for you and you can use them from your you helpers.
+To create custom `I.*` commands using Puppeteer API you need to create a custom helper.
 
 Start with creating an `MyPuppeteer` helper using `generate:helper` or `gh` command:
 
@@ -315,4 +298,3 @@ async renderPageToPdf() {
 The same way you can also access `browser` object to implement more actions or handle events.
 
 > [▶ Learn more about Helpers](http://codecept.io/helpers/)
-

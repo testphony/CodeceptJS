@@ -165,6 +165,29 @@ describe('WebDriver', function () {
     });
   });
 
+  describe('Force Right Click: #forceRightClick', () => {
+    it('it should forceRightClick', async () => {
+      await wd.amOnPage('/form/rightclick');
+      await wd.dontSee('right clicked');
+      await wd.forceRightClick('Lorem Ipsum');
+      await wd.see('right clicked');
+    });
+
+    it('it should forceRightClick by locator', async () => {
+      await wd.amOnPage('/form/rightclick');
+      await wd.dontSee('right clicked');
+      await wd.forceRightClick('.context a');
+      await wd.see('right clicked');
+    });
+
+    it('it should forceRightClick by locator and context', async () => {
+      await wd.amOnPage('/form/rightclick');
+      await wd.dontSee('right clicked');
+      await wd.forceRightClick('Lorem Ipsum', '.context');
+      await wd.see('right clicked');
+    });
+  });
+
   describe('#pressKey, #pressKeyDown, #pressKeyUp', () => {
     it('should be able to send special keys to element', async () => {
       await wd.amOnPage('/form/field');
@@ -833,7 +856,6 @@ describe('WebDriver', function () {
     });
   });
 
-
   describe('#_locateCheckable', () => {
     it('should locate a checkbox', async () => {
       await wd.amOnPage('/form/checkbox');
@@ -954,7 +976,6 @@ describe('WebDriver', function () {
       await wd.attachFile('hidden', '/app/avatar.jpg');
     });
   });
-
 
   describe('#dragSlider', () => {
     it('should drag scrubber to given position', async () => {
@@ -1109,8 +1130,8 @@ describe('WebDriver', function () {
 
   describe('#grabElementBoundingRect', () => {
     it('should get the element size', async () => {
-      await wd.amOnPage('https://www.google.com');
-      const size = await wd.grabElementBoundingRect('#hplogo');
+      await wd.amOnPage('/form/hidden');
+      const size = await wd.grabElementBoundingRect('input[type=submit]');
       expect(size.x).is.greaterThan(0);
       expect(size.y).is.greaterThan(0);
       expect(size.width).is.greaterThan(0);
@@ -1118,15 +1139,77 @@ describe('WebDriver', function () {
     });
 
     it('should get the element width', async () => {
-      await wd.amOnPage('https://www.google.com');
-      const width = await wd.grabElementBoundingRect('#hplogo', 'width');
+      await wd.amOnPage('/form/hidden');
+      const width = await wd.grabElementBoundingRect('input[type=submit]', 'width');
       expect(width).is.greaterThan(0);
     });
 
     it('should get the element height', async () => {
-      await wd.amOnPage('https://www.google.com');
-      const height = await wd.grabElementBoundingRect('#hplogo', 'height');
+      await wd.amOnPage('/form/hidden');
+      const height = await wd.grabElementBoundingRect('input[type=submit]', 'height');
       expect(height).is.greaterThan(0);
+    });
+  });
+
+  describe('#scrollIntoView', () => {
+    it('should scroll element into viewport', async () => {
+      await wd.amOnPage('/form/scroll_into_view');
+      const element = await wd.browser.$('#notInViewportByDefault');
+      expect(await element.isDisplayedInViewport()).to.be.false;
+      await wd.scrollIntoView('#notInViewportByDefault');
+      expect(await element.isDisplayedInViewport()).to.be.true;
+    });
+  });
+
+  describe('#useWebDriverTo', () => {
+    it('should return title', async () => {
+      await wd.amOnPage('/');
+      const title = await wd.useWebDriverTo('test', async ({ browser }) => {
+        return browser.getTitle();
+      });
+      assert.equal('TestEd Beta 2.0', title);
+    });
+  });
+});
+
+describe('WebDriver - Basic Authentication', () => {
+  before(() => {
+    global.codecept_dir = path.join(__dirname, '/../data');
+    try {
+      fs.unlinkSync(dataFile);
+    } catch (err) {
+      // continue regardless of error
+    }
+
+    wd = new WebDriver({
+      url: siteUrl,
+      basicAuth: { username: 'admin', password: 'admin' },
+      browser: 'chrome',
+      windowSize: '500x700',
+      remoteFileUpload: true,
+      smartWait: 0, // just to try
+      host: TestHelper.seleniumHost(),
+      port: TestHelper.seleniumPort(),
+      waitForTimeout: 5000,
+      capabilities: {
+        chromeOptions: {
+          args: ['--headless', '--disable-gpu', '--window-size=1280,1024'],
+        },
+      },
+    });
+  });
+
+  beforeEach(async () => {
+    webApiTests.init({ I: wd, siteUrl });
+    await wd._before();
+  });
+
+  afterEach(() => wd._after());
+
+  describe('open page : #amOnPage', () => {
+    it('should be authenticated', async () => {
+      await wd.amOnPage('/basic_auth');
+      await wd.see('You entered admin as your password.');
     });
   });
 });

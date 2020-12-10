@@ -1,5 +1,7 @@
 ---
-id: Protractor
+permalink: /helpers/Protractor
+editLink: false
+sidebar: auto
 title: Protractor
 ---
 
@@ -34,7 +36,7 @@ This helper should be configured in codecept.json or codecept.conf.js
 -   `waitForTimeout`: (optional) sets default wait time in _ms_ for all `wait*` functions. 1000 by default.
 -   `scriptsTimeout`: (optional) timeout in milliseconds for each script run on the browser, 10000 by default.
 -   `windowSize`: (optional) default window size. Set to `maximize` or a dimension in the format `640x480`.
--   `manualStart`  - do not start browser before a test, start it manually inside a helper with `this.helpers["WebDriverIO"]._startBrowser()`
+-   `manualStart`  - do not start browser before a test, start it manually inside a helper with `this.helpers.WebDriver._startBrowser()`
 -   `capabilities`: {} - list of [Desired Capabilities][5]
 -   `proxy`: set proxy settings
 
@@ -566,8 +568,8 @@ I.fillField({css: 'form#login input[name=username]'}, 'John');
 ### grabAttributeFrom
 
 Retrieves an attribute from an element located by CSS or XPath and returns it to test.
-An array as a result will be returned if there are more than one matched element.
 Resumes test execution, so **should be used inside async with `await`** operator.
+If more than one element is found - attribute of first element is returned.
 
 ```js
 let hint = await I.grabAttributeFrom('#tooltip', 'title');
@@ -580,6 +582,22 @@ let hint = await I.grabAttributeFrom('#tooltip', 'title');
 
 Returns **[Promise][13]&lt;[string][9]>** attribute value
 
+### grabAttributeFromAll
+
+Retrieves an array of attributes from elements located by CSS or XPath and returns it to test.
+Resumes test execution, so **should be used inside async with `await`** operator.
+
+```js
+let hints = await I.grabAttributeFromAll('.tooltip', 'title');
+```
+
+#### Parameters
+
+-   `locator` **([string][9] | [object][10])** element located by CSS|XPath|strict locator.
+-   `attr` **[string][9]** attribute name.
+
+Returns **[Promise][13]&lt;[Array][14]&lt;[string][9]>>** attribute value
+
 ### grabBrowserLogs
 
 Get JS log from browser. Log buffer is reset after each request.
@@ -590,13 +608,13 @@ let logs = await I.grabBrowserLogs();
 console.log(JSON.stringify(logs))
 ```
 
-Returns **[Promise][13]&lt;[Array][14]&lt;any>>** all browser logs
+Returns **([Promise][13]&lt;[Array][14]&lt;[object][10]>> | [undefined][15])** all browser logs
 
 ### grabCookie
 
 Gets a cookie object by name.
 If none provided gets all cookies.
-Resumes test execution, so **should be used inside async with `await`** operator.
+Resumes test execution, so **should be used inside async function with `await`** operator.
 
 ```js
 let cookie = await I.grabCookie('auth');
@@ -607,12 +625,13 @@ assert(cookie.value, '123456');
 
 -   `name` **[string][9]?** cookie name. 
 
-Returns **[Promise][13]&lt;[string][9]>** attribute valueReturns cookie in JSON [format][15].
+Returns **([Promise][13]&lt;[string][9]> | [Promise][13]&lt;[Array][14]&lt;[string][9]>>)** attribute valueReturns cookie in JSON [format][16].
 
 ### grabCssPropertyFrom
 
 Grab CSS property for given locator
 Resumes test execution, so **should be used inside an async function with `await`** operator.
+If more than one element is found - value of first element is returned.
 
 ```js
 const value = await I.grabCssPropertyFrom('h3', 'font-weight');
@@ -624,6 +643,22 @@ const value = await I.grabCssPropertyFrom('h3', 'font-weight');
 -   `cssProperty` **[string][9]** CSS property name.
 
 Returns **[Promise][13]&lt;[string][9]>** CSS value
+
+### grabCssPropertyFromAll
+
+Grab array of CSS properties for given locator
+Resumes test execution, so **should be used inside an async function with `await`** operator.
+
+```js
+const values = await I.grabCssPropertyFromAll('h3', 'font-weight');
+```
+
+#### Parameters
+
+-   `locator` **([string][9] | [object][10])** element located by CSS|XPath|strict locator.
+-   `cssProperty` **[string][9]** CSS property name.
+
+Returns **[Promise][13]&lt;[Array][14]&lt;[string][9]>>** CSS value
 
 ### grabCurrentUrl
 
@@ -641,7 +676,7 @@ Returns **[Promise][13]&lt;[string][9]>** current URL
 
 Retrieves the innerHTML from an element located by CSS or XPath and returns it to test.
 Resumes test execution, so **should be used inside async function with `await`** operator.
-If more than one element is found - an array of HTMLs returned.
+If more than one element is found - HTML of first element is returned.
 
 ```js
 let postHTML = await I.grabHTMLFrom('#post');
@@ -654,9 +689,26 @@ let postHTML = await I.grabHTMLFrom('#post');
 
 Returns **[Promise][13]&lt;[string][9]>** HTML code for an element
 
+### grabHTMLFromAll
+
+Retrieves all the innerHTML from elements located by CSS or XPath and returns it to test.
+Resumes test execution, so **should be used inside async function with `await`** operator.
+
+```js
+let postHTMLs = await I.grabHTMLFromAll('.post');
+```
+
+#### Parameters
+
+-   `locator`  
+-   `element` **([string][9] | [object][10])** located by CSS|XPath|strict locator.
+
+Returns **[Promise][13]&lt;[Array][14]&lt;[string][9]>>** HTML code for an element
+
 ### grabNumberOfOpenTabs
 
 Grab number of open tabs.
+Resumes test execution, so **should be used inside async function with `await`** operator.
 
 ```js
 let tabs = await I.grabNumberOfOpenTabs();
@@ -667,6 +719,7 @@ Returns **[Promise][13]&lt;[number][7]>** number of open tabs
 ### grabNumberOfVisibleElements
 
 Grab number of visible elements by locator.
+Resumes test execution, so **should be used inside async function with `await`** operator.
 
 ```js
 let numOfElements = await I.grabNumberOfVisibleElements('p');
@@ -687,7 +740,7 @@ Resumes test execution, so **should be used inside an async function with `await
 let { x, y } = await I.grabPageScrollPosition();
 ```
 
-Returns **[Promise][13]&lt;[Object][10]&lt;[string][9], any>>** scroll position
+Returns **[Promise][13]&lt;PageScrollPosition>** scroll position
 
 ### grabPopupText
 
@@ -700,7 +753,7 @@ await I.grabPopupText();
 ### grabSource
 
 Retrieves page source and returns it to test.
-Resumes test execution, so should be used inside an async function.
+Resumes test execution, so **should be used inside async function with `await`** operator.
 
 ```js
 let pageSource = await I.grabSource();
@@ -717,13 +770,28 @@ Resumes test execution, so **should be used inside async with `await`** operator
 let pin = await I.grabTextFrom('#pin');
 ```
 
-If multiple elements found returns an array of texts.
+If multiple elements found returns first element.
 
 #### Parameters
 
 -   `locator` **([string][9] | [object][10])** element located by CSS|XPath|strict locator.
 
-Returns **[Promise][13]&lt;([string][9] | [Array][14]&lt;[string][9]>)>** attribute value
+Returns **[Promise][13]&lt;[string][9]>** attribute value
+
+### grabTextFromAll
+
+Retrieves all texts from an element located by CSS or XPath and returns it to test.
+Resumes test execution, so **should be used inside async with `await`** operator.
+
+```js
+let pins = await I.grabTextFromAll('#pin li');
+```
+
+#### Parameters
+
+-   `locator` **([string][9] | [object][10])** element located by CSS|XPath|strict locator.
+
+Returns **[Promise][13]&lt;[Array][14]&lt;[string][9]>>** attribute value
 
 ### grabTitle
 
@@ -740,6 +808,7 @@ Returns **[Promise][13]&lt;[string][9]>** title
 
 Retrieves a value from a form element located by CSS or XPath and returns it to test.
 Resumes test execution, so **should be used inside async function with `await`** operator.
+If more than one element is found - value of first element is returned.
 
 ```js
 let email = await I.grabValueFrom('input[name=email]');
@@ -750,6 +819,21 @@ let email = await I.grabValueFrom('input[name=email]');
 -   `locator` **([string][9] | [object][10])** field located by label|name|CSS|XPath|strict locator.
 
 Returns **[Promise][13]&lt;[string][9]>** attribute value
+
+### grabValueFromAll
+
+Retrieves an array of value from a form located by CSS or XPath and returns it to test.
+Resumes test execution, so **should be used inside async function with `await`** operator.
+
+```js
+let inputs = await I.grabValueFromAll('//form/input');
+```
+
+#### Parameters
+
+-   `locator` **([string][9] | [object][10])** field located by label|name|CSS|XPath|strict locator.
+
+Returns **[Promise][13]&lt;[Array][14]&lt;[string][9]>>** attribute value
 
 ### haveModule
 
@@ -801,7 +885,7 @@ I.openNewTab();
 ### pressKey
 
 Presses a key on a focused element.
-Special keys like 'Enter', 'Control', [etc][16]
+Special keys like 'Enter', 'Control', [etc][17]
 will be replaced with corresponding unicode.
 If modifier key is used (Control, Command, Alt, Shift) in array, it will be released afterwards.
 
@@ -901,6 +985,20 @@ I.rightClick('Click me', '.context');
 -   `locator` **([string][9] | [object][10])** clickable element located by CSS|XPath|strict locator.
 -   `context` **([string][9]? | [object][10])** (optional, `null` by default) element located by CSS|XPath|strict locator. 
 
+### saveElementScreenshot
+
+Saves screenshot of the specified locator to ouput folder (set in codecept.json or codecept.conf.js).
+Filename is relative to output folder.
+
+```js
+I.saveElementScreenshot(`#submit`,'debug.png');
+```
+
+#### Parameters
+
+-   `locator` **([string][9] | [object][10])** element located by CSS|XPath|strict locator.
+-   `fileName` **[string][9]** file name to save.
+
 ### saveScreenshot
 
 Saves a screenshot to ouput folder (set in codecept.json or codecept.conf.js).
@@ -915,7 +1013,7 @@ I.saveScreenshot('debug.png', true) //resizes to available scrollHeight and scro
 #### Parameters
 
 -   `fileName` **[string][9]** file name to save.
--   `fullPage` **[boolean][17]** (optional, `false` by default) flag to enable fullscreen screenshot mode. 
+-   `fullPage` **[boolean][18]** (optional, `false` by default) flag to enable fullscreen screenshot mode. 
 
 ### scrollPageToBottom
 
@@ -1092,9 +1190,13 @@ I.seeInField('#searchform input','Search');
 Checks that the active JavaScript popup, as created by `window.alert|window.confirm|window.prompt`, contains the
 given string.
 
+```js
+I.seeInPopup('Popup text');
+```
+
 #### Parameters
 
--   `text`  
+-   `text` **[string][9]** value to check.
 
 ### seeInSource
 
@@ -1158,8 +1260,8 @@ I.seeTextEquals('text', 'h1');
 
 #### Parameters
 
--   `text`  
--   `context`   
+-   `text` **[string][9]** element value to check.
+-   `context` **([string][9] | [object][10]?)** element located by CSS|XPath|strict locator. 
 
 ### seeTitleEquals
 
@@ -1201,15 +1303,23 @@ I.selectOption('Which OS do you use?', ['Android', 'iOS']);
 
 ### setCookie
 
-Sets a cookie.
+Sets cookie(s).
+
+Can be a single cookie object or an array of cookies:
 
 ```js
 I.setCookie({name: 'auth', value: true});
+
+// as array
+I.setCookie([
+  {name: 'auth', value: true},
+  {name: 'agree', value: true}
+]);
 ```
 
 #### Parameters
 
--   `cookie` **[object][10]** a cookie object.
+-   `cookie` **(Cookie | [Array][14]&lt;Cookie>)** a cookie object or array of cookie objects.
 
 ### switchTo
 
@@ -1267,6 +1377,26 @@ I.uncheckOption('agree', '//form');
 
 -   `field` **([string][9] | [object][10])** checkbox located by label | name | CSS | XPath | strict locator.
 -   `context` **([string][9]? | [object][10])** (optional, `null` by default) element located by CSS | XPath | strict locator. 
+
+### useProtractorTo
+
+Use [Protractor][19] API inside a test.
+
+First argument is a description of an action.
+Second argument is async function that gets this helper as parameter.
+
+{ [`browser`][20]) } object from Protractor API is available.
+
+```js
+I.useProtractorTo('change url via in-page navigation', async ({ browser }) {
+   await browser.setLocation('api');
+});
+```
+
+#### Parameters
+
+-   `description` **[string][9]** used to show in logs.
+-   `fn` **[function][12]** async functuion that executed with Protractor helper as argument
 
 ### wait
 
@@ -1515,8 +1645,14 @@ just press button if no selector is given
 
 [14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[15]: https://code.google.com/p/selenium/wiki/JsonWireProtocol#Cookie_JSON_Object
+[15]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined
 
-[16]: https://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/value
+[16]: https://code.google.com/p/selenium/wiki/JsonWireProtocol#Cookie_JSON_Object
 
-[17]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[17]: https://code.google.com/p/selenium/wiki/JsonWireProtocol#/session/:sessionId/element/:id/value
+
+[18]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[19]: https://www.protractortest.org/#/api
+
+[20]: https://www.protractortest.org/#/api?view=ProtractorBrowser

@@ -1,5 +1,6 @@
-const config = require('../../lib/config');
 const { expect } = require('chai');
+
+const config = require('../../lib/config');
 
 describe('Config', () => {
   beforeEach(() => config.reset());
@@ -15,7 +16,6 @@ describe('Config', () => {
     expect(config.get('output', './other')).to.eql('./report');
     expect(config.get('tests', '**_test.js')).to.eql('**_test.js');
   });
-
 
   it('should be completely reset', () => {
     config.addHook((cfg) => {

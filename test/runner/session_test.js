@@ -6,7 +6,7 @@ const runner = path.join(__dirname, '/../../bin/codecept.js');
 const codecept_dir = path.join(__dirname, '/../data/sandbox');
 const codecept_run = `${runner} run --config ${codecept_dir}/codecept.session.json `;
 
-describe('CodeceptJS session', function () {
+xdescribe('CodeceptJS session', function () {
   this.timeout(40000);
 
   before(() => {
@@ -14,7 +14,7 @@ describe('CodeceptJS session', function () {
   });
 
   it('should run with 3 sessions', (done) => {
-    exec(`${codecept_run} --steps --grep "@1"`, (err, stdout, stderr) => {
+    exec(`${codecept_run} --steps --grep "@1"`, (err, stdout) => {
       const lines = stdout.match(/\S.+/g);
 
       const list = grepLines(lines, 'basic session @1');
@@ -37,7 +37,7 @@ describe('CodeceptJS session', function () {
   });
 
   it('should run session defined before executing', (done) => {
-    exec(`${codecept_run} --steps --grep "@2"`, (err, stdout, stderr) => {
+    exec(`${codecept_run} --steps --grep "@2"`, (err, stdout) => {
       const lines = stdout.match(/\S.+/g);
 
       const list = grepLines(lines, 'session defined not used @2');
@@ -59,7 +59,7 @@ describe('CodeceptJS session', function () {
   });
 
   it('should run all session tests', (done) => {
-    exec(`${codecept_run} --steps`, (err, stdout, stderr) => {
+    exec(`${codecept_run} --steps`, (err, stdout) => {
       const lines = stdout.match(/\S.+/g);
       const testStatus = lines.pop();
       testStatus.should.include('passed');
